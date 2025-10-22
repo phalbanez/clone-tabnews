@@ -105,6 +105,7 @@ async function create(userInputValues) {
           id,
           username,
           email,
+          features,
           password,
           created_at,
           updated_at
@@ -159,6 +160,8 @@ async function update(username, userInputValues) {
           id,
           username,
           email,
+          features,
+          password,
           created_at,
           updated_at
       `,
