@@ -149,8 +149,8 @@ async function update(username, userInputValues) {
     ...userInputValues,
   };
 
-  const updateUser = await runUpdateQuery(userWithNewValues);
-  return updateUser;
+  const updatedUser = await runUpdateQuery(userWithNewValues);
+  return updatedUser;
 
   async function runUpdateQuery(userWithNewValues) {
     const results = await database.query({
@@ -224,12 +224,36 @@ async function validateUniqueEmail(email) {
   }
 }
 
+async function setFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const results = await database.query({
+      text: `
+        UPDATE users
+        SET 
+          features = $2,
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      `,
+      values: [userId, features],
+    });
+
+    return results.rows[0];
+  }
+}
+
 const user = {
   findOneById,
   findOneByUsername,
   findOneByEmail,
   create,
   update,
+  setFeatures,
 };
 
 export default user;
