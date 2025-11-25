@@ -24,7 +24,7 @@ describe("Use case: Registration Flow (all successful)", () => {
         },
         body: JSON.stringify({
           username: "RegistrationFlow",
-          email: "resgitration.flow@curso.dev",
+          email: "registration.flow@curso.dev",
           password: "RegistrationFlowPassword!",
         }),
       },
@@ -37,7 +37,7 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(createUserResponseBody).toEqual({
       id: createUserResponseBody.id,
       username: "RegistrationFlow",
-      email: "resgitration.flow@curso.dev",
+      email: "registration.flow@curso.dev",
       features: ["read:activation_token"],
       password: createUserResponseBody.password,
       created_at: createUserResponseBody.created_at,
@@ -49,7 +49,7 @@ describe("Use case: Registration Flow (all successful)", () => {
     const lastEmail = await orchestrator.getLastEmail();
 
     expect(lastEmail.sender).toBe("<contato@fintab.com.br>");
-    expect(lastEmail.recipients[0]).toBe("<resgitration.flow@curso.dev>");
+    expect(lastEmail.recipients[0]).toBe("<registration.flow@curso.dev>");
     expect(lastEmail.subject).toBe("Ative seu cadastro no FinTab!");
     expect(lastEmail.text).toContain("RegistrationFlow");
 
@@ -84,7 +84,29 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(activatedUser.features).toEqual(["create:session"]);
   });
 
-  test("Login", async () => {});
+  test("Login", async () => {
+    const createSessionsResponse = await fetch(
+      "http://localhost:3000/api/v1/sessions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: "registration.flow@curso.dev",
+          password: "RegistrationFlowPassword!",
+        }),
+      },
+    );
+
+    expect(createSessionsResponse.status).toBe(201);
+
+    const createSessionsResponseBody = await createSessionsResponse.json();
+
+    expect(createSessionsResponseBody.user_id).toEqual(
+      createUserResponseBody.id,
+    );
+  });
 
   test("Get user information", async () => {});
 });
