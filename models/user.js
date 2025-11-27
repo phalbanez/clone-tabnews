@@ -196,8 +196,8 @@ async function validateUniqueUsername(username) {
 
   if (results.rowCount > 0) {
     throw new ValidationError({
-      message: "O nome de usuário informado já esta sendo utilizado.",
-      action: "Utilize outro nome de usuário para realizar esta operação.",
+      message: "O username informado já está sendo utilizado.",
+      action: "Utilize outro username para realizar esta operação.",
     });
   }
 }
@@ -218,7 +218,7 @@ async function validateUniqueEmail(email) {
 
   if (results.rowCount > 0) {
     throw new ValidationError({
-      message: "O email informado já esta sendo utilizado.",
+      message: "O email informado já está sendo utilizado.",
       action: "Utilize outro email para realizar esta operação.",
     });
   }

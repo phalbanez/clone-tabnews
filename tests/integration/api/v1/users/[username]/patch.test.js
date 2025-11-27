@@ -52,8 +52,8 @@ describe("PATCH /api/v1/users/[username]", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O nome de usuário informado já esta sendo utilizado.",
-        action: "Utilize outro nome de usuário para realizar esta operação.",
+        message: "O username informado já está sendo utilizado.",
+        action: "Utilize outro username para realizar esta operação.",
         status_code: 400,
       });
     });
@@ -85,7 +85,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O email informado já esta sendo utilizado.",
+        message: "O email informado já está sendo utilizado.",
         action: "Utilize outro email para realizar esta operação.",
         status_code: 400,
       });
