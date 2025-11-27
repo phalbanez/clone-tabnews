@@ -88,10 +88,12 @@ describe("POST /api/v1/sessions", () => {
     });
 
     test("With correct `email` and correct `password`", async () => {
-      const createUser = await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         email: "tudo.correto@curso.dev",
         password: "tudocorreto",
       });
+
+      await orchestrator.activateUser(createdUser);
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
@@ -103,6 +105,7 @@ describe("POST /api/v1/sessions", () => {
           password: "tudocorreto",
         }),
       });
+
       expect(response.status).toBe(201);
 
       const responseBody = await response.json();
@@ -110,7 +113,7 @@ describe("POST /api/v1/sessions", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         token: responseBody.token,
-        user_id: createUser.id,
+        user_id: createdUser.id,
         expires_at: responseBody.expires_at,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,

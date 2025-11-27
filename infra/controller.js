@@ -7,6 +7,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from "infra/errors";
+import autotization from "models/autorization";
 import session from "models/session";
 import user from "models/user";
 
@@ -98,7 +99,7 @@ function canRequest(feature) {
   return function canRequestMiddleware(request, response, next) {
     const userTryingtoRequest = request.context.user;
 
-    if (userTryingtoRequest.features.includes(feature)) {
+    if (autotization.can(userTryingtoRequest, feature)) {
       return next();
     }
 
