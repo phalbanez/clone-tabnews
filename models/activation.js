@@ -1,7 +1,8 @@
 import database from "infra/database";
 import email from "infra/email";
-import { NotFoundError } from "infra/errors";
+import { ForbiddenError, NotFoundError } from "infra/errors";
 import webserver from "infra/webserver";
+import autorization from "./autorization";
 import user from "./user";
 
 const EXPITATION_IN_MILLISECONS = 60 * 15 * 1000; // 15 minutes
@@ -53,7 +54,7 @@ async function findOneValidById(tokenId) {
     if (results.rowCount === 0) {
       throw new NotFoundError({
         message:
-          "O token de ativaçãp utilizado não foi encontrado no sistema ou expirou.",
+          "O token de ativação utilizado não foi encontrado no sistema ou expirou.",
         action: "Faça um novo cadastro.",
       });
     }
@@ -87,6 +88,15 @@ async function markTokenAsUsed(activationTokenId) {
 }
 
 async function activateUserByUserId(userId) {
+  const userToActivate = await user.findOneById(userId);
+
+  if (!autorization.can(userToActivate, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+
   const activatedUser = await user.setFeatures(userId, [
     "create:session",
     "read:session",
@@ -110,6 +120,7 @@ Equipe FinTab`,
 }
 
 const activation = {
+  EXPITATION_IN_MILLISECONS,
   create,
   findOneValidById,
   markTokenAsUsed,
