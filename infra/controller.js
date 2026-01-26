@@ -7,7 +7,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from "infra/errors";
-import autotization from "models/autorization";
+import autotization from "models/authorization";
 import session from "models/session";
 import user from "models/user";
 

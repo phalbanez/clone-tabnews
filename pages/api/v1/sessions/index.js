@@ -1,7 +1,7 @@
 import controller from "infra/controller";
 import { ForbiddenError } from "infra/errors";
 import authentication from "models/authentication";
-import autorization from "models/autorization";
+import autorization from "models/authorization";
 import session from "models/session";
 import { createRouter } from "next-connect";
 

@@ -2,7 +2,7 @@ import database from "infra/database";
 import email from "infra/email";
 import { ForbiddenError, NotFoundError } from "infra/errors";
 import webserver from "infra/webserver";
-import autorization from "./autorization";
+import autorization from "./authorization";
 import user from "./user";
 
 const EXPITATION_IN_MILLISECONS = 60 * 15 * 1000; // 15 minutes
