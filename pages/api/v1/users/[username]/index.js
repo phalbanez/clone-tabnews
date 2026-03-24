@@ -1,6 +1,6 @@
 import controller from "infra/controller";
 import { ForbiddenError } from "infra/errors";
-import authorization from "models/authorization";
+import { default as authorization } from "models/authorization";
 import user from "models/user";
 import { createRouter } from "next-connect";
 
@@ -13,10 +13,17 @@ router.patch(controller.canRequest("update:user"), patchHandler);
 export default router.handler(controller.errorHandles);
 
 async function getHandler(request, response) {
+  const userTryingToGet = request.context.user;
   const username = request.query.username;
   const userFound = await user.findOneByUsername(username);
 
-  return response.status(200).json(userFound);
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToGet,
+    "read:user",
+    userFound,
+  );
+
+  return response.status(200).json(secureOutputValues);
 }
 
 async function patchHandler(request, response) {
@@ -35,5 +42,12 @@ async function patchHandler(request, response) {
   }
 
   const updateUser = await user.update(username, userInputValues);
-  return response.status(200).json(updateUser);
+
+  const secureOutputValues = authorization.filterOutput(
+    userTryingToPatch,
+    "read:user",
+    updateUser,
+  );
+
+  return response.status(200).json(secureOutputValues);
 }

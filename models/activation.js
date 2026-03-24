@@ -2,7 +2,7 @@ import database from "infra/database";
 import email from "infra/email";
 import { ForbiddenError, NotFoundError } from "infra/errors";
 import webserver from "infra/webserver";
-import autorization from "./authorization";
+import authorization from "./authorization";
 import user from "./user";
 
 const EXPITATION_IN_MILLISECONS = 60 * 15 * 1000; // 15 minutes
@@ -90,7 +90,7 @@ async function markTokenAsUsed(activationTokenId) {
 async function activateUserByUserId(userId) {
   const userToActivate = await user.findOneById(userId);
 
-  if (!autorization.can(userToActivate, "read:activation_token")) {
+  if (!authorization.can(userToActivate, "read:activation_token")) {
     throw new ForbiddenError({
       message: "Você não pode mais utilizar tokens de ativação.",
       action: "Entre em contato com o suporte.",
