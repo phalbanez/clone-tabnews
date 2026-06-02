@@ -3,13 +3,11 @@ import authorization from "models/authorization";
 import migrator from "models/migrator";
 import { createRouter } from "next-connect";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest("read:migration"), getHandler);
-router.post(controller.canRequest("create:migration"), postHandler);
-
-export default router.handler(controller.errorHandles);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest("read:migration"), getHandler)
+  .post(controller.canRequest("create:migration"), postHandler)
+  .handler(controller.errorHandles);
 
 async function getHandler(request, response) {
   const userTryingToGet = request.context.user;

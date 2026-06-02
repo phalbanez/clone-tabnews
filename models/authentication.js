@@ -2,7 +2,7 @@ import { NotFoundError, UnauthorizedError } from "infra/errors";
 import password from "./password";
 import user from "./user";
 
-async function getAuthenticatedUser(providedEmail, providedPassword) {
+async function getUser(providedEmail, providedPassword) {
   if (!providedEmail || !providedPassword) {
     throw new Error("Email and password are required for authentication.");
   }
@@ -55,7 +55,7 @@ async function getAuthenticatedUser(providedEmail, providedPassword) {
 }
 
 const authentication = {
-  getAuthenticatedUser,
+  getUser: getUser,
 };
 
 export default authentication;
