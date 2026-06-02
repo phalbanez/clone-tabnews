@@ -5,13 +5,11 @@ import authorization from "models/authorization";
 import session from "models/session";
 import { createRouter } from "next-connect";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.post(controller.canRequest("create:session"), postHandler);
-router.delete(deleteHandler);
-
-export default router.handler(controller.errorHandles);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest("create:session"), postHandler)
+  .delete(deleteHandler)
+  .handler(controller.errorHandles);
 
 async function postHandler(request, response) {
   const userInputValues = request.body;

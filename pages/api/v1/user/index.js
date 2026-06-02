@@ -4,12 +4,10 @@ import session from "models/session";
 import user from "models/user";
 import { createRouter } from "next-connect";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest("read:session"), getHandler);
-
-export default router.handler(controller.errorHandles);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest("read:session"), getHandler)
+  .handler(controller.errorHandles);
 
 async function getHandler(request, response) {
   const userTryingToGet = request.context.user;
