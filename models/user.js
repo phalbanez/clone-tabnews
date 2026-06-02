@@ -84,6 +84,7 @@ async function create(userInputValues) {
   await validateUniqueUsername(userInputValues.username);
   await validateUniqueEmail(userInputValues.email);
   await hashPasswordInObject(userInputValues);
+  injectDefaultFeaturesInObject(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
@@ -94,17 +95,20 @@ async function create(userInputValues) {
         INSERT INTO users (
           username,
           email,
-          password
+          password,
+          features
         )
         VALUES (
           $1,
           LOWER($2),
-          $3
+          $3,
+          $4
         )
         RETURNING
           id,
           username,
           email,
+          features,
           password,
           created_at,
           updated_at
@@ -113,10 +117,15 @@ async function create(userInputValues) {
         userInputValues.username,
         userInputValues.email,
         userInputValues.password,
+        userInputValues.features,
       ],
     });
 
     return results.rows[0];
+  }
+
+  function injectDefaultFeaturesInObject(userInputValues) {
+    userInputValues.features = ["read:activation_token"];
   }
 }
 
@@ -140,8 +149,8 @@ async function update(username, userInputValues) {
     ...userInputValues,
   };
 
-  const updateUser = await runUpdateQuery(userWithNewValues);
-  return updateUser;
+  const updatedUser = await runUpdateQuery(userWithNewValues);
+  return updatedUser;
 
   async function runUpdateQuery(userWithNewValues) {
     const results = await database.query({
@@ -159,6 +168,8 @@ async function update(username, userInputValues) {
           id,
           username,
           email,
+          features,
+          password,
           created_at,
           updated_at
       `,
@@ -185,8 +196,8 @@ async function validateUniqueUsername(username) {
 
   if (results.rowCount > 0) {
     throw new ValidationError({
-      message: "O nome de usuário informado já esta sendo utilizado.",
-      action: "Utilize outro nome de usuário para realizar esta operação.",
+      message: "O username informado já está sendo utilizado.",
+      action: "Utilize outro username para realizar esta operação.",
     });
   }
 }
@@ -207,9 +218,55 @@ async function validateUniqueEmail(email) {
 
   if (results.rowCount > 0) {
     throw new ValidationError({
-      message: "O email informado já esta sendo utilizado.",
+      message: "O email informado já está sendo utilizado.",
       action: "Utilize outro email para realizar esta operação.",
     });
+  }
+}
+
+async function setFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const results = await database.query({
+      text: `
+        UPDATE users
+        SET 
+          features = $2,
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      `,
+      values: [userId, features],
+    });
+
+    return results.rows[0];
+  }
+}
+
+async function addFeatures(userId, features) {
+  const updatedUser = await runUpdateQuery(userId, features);
+  return updatedUser;
+
+  async function runUpdateQuery(userId, features) {
+    const results = await database.query({
+      text: `
+        UPDATE users
+        SET 
+          features = array_cat(features, $2),
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      `,
+      values: [userId, features],
+    });
+
+    return results.rows[0];
   }
 }
 
@@ -219,6 +276,8 @@ const user = {
   findOneByEmail,
   create,
   update,
+  setFeatures,
+  addFeatures,
 };
 
 export default user;
